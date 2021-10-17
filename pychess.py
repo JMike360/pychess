@@ -36,19 +36,65 @@ def DrawBoard(window):
         boardSquares.append(squareRow)
     return boardSquares
 
-def PlacePieces(window):
+class Piece:
+    def __init__(self, pieceId, coord, window):
+        self.Id = pieceId
+        self.Location = coord
+        self.window = window
+        self.image = Image(Point(40,40), "img/Chess_bdt45.svg")
+    
+    def move(self):
+        xIdx = ord(self.Location[0]) - 97
+        yIdx = int(self.Location[1])
+
+        x = xIdx * 80 + 40
+        y = yIdx * 80 + 40
+
+        point = self.image.getAnchor()
+        dx = x - point.getX()
+        dy = y - point.getY()
+
+        self.image.move(dx, dy) 
+
+    def Place(self, coord = None):
+        if(coord):
+            self.Location = coord
+
+        self.move()
+        self.image.draw(self.window)
+        a = self.image.getAnchor()
+        print("Placed at", a.getX(), a.getY())
+
+    def Move(self, coord):
+        self.Location = coord
+        #check for move validity 
+        self.move()
+
+        return coord
+
+
+def PlacePieces(window, pieceArray=None):
     print("Placing some pieces...")
-    img = Image(Point(40,40),"img/Chess_bdt45.svg")
-    img.draw(window)
 
-    img = Image(Point(120,120),"img/Chess_kdt45.svg")
-    img.draw(window)
+    if(not pieceArray or (type(pieceArray) is not list)):
+        img = Image(Point(40,40),"img/Chess_bdt45.svg")
+        img.draw(window)
 
-    img = Image(Point(200,200),"img/Chess_klt45.svg")
-    img.draw(window)
+        img = Image(Point(120,120),"img/Chess_kdt45.svg")
+        img.draw(window)
 
-    img = Image(Point(280,280),"img/Chess_qdt45.svg")
-    img.draw(window)
+        img = Image(Point(200,200),"img/Chess_klt45.svg")
+        img.draw(window)
+
+        img = Image(Point(280,280),"img/Chess_qdt45.svg")
+        img.draw(window)
+        return
+
+    print("Placing using classes...")
+    for p in pieceArray:
+        p.Place()
+
+    
 
 def highlightSelectedSquare(squares, point, previous):
     prevSquare = previous
@@ -76,13 +122,13 @@ def main():
     print("I'm gonna draw a board...")
     win = GraphWin("Board", 640,640)
     squares = DrawBoard(win)
-    PlacePieces(win)
+    pieceArray = [Piece('k','h8',win )]
+    PlacePieces(win, pieceArray)
     selectedSquare = None 
     prev = None
     while(True):
         mousePoint = win.getMouse()
         prev = highlightSelectedSquare(squares, mousePoint, prev)
-        print(mousePoint)
     win.close()
     
 
